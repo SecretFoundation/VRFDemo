@@ -14,7 +14,7 @@ export async function setupSubmit(element: HTMLButtonElement) {
     element.addEventListener("click", async function(event: Event){
         event.preventDefault()
         const [myAddress] = await provider.send("eth_requestAccounts", []);
-        await window.ethereum.request({
+        await (window as any).ethereum.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: '0xAA36A7' }], // chainId must be in hexadecimal numbers
         });
