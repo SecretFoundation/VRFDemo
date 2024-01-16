@@ -1,8 +1,9 @@
 import { ethers } from "ethers";
+import { BigNumber } from "bignumber.js";
 
 export async function setupSubmit(element: HTMLButtonElement) {
 
-    const randomnessContract = '0xEAD4fC9fAEd0De8A68e82936238740E957Ccf865'
+    const randomnessContract = '0x6350913fDbBb5700100078e1d649836d35F212C1'
 
     // @ts-ignore
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -52,11 +53,7 @@ export async function setupSubmit(element: HTMLButtonElement) {
 
         // Set up an event listener for the 'logNewTask' event
         randomnessContractInterface.on('requestRandomness', (originalRequestId) => {
-            // This code is executed when the event is emitted
             console.log(`Request ID: ${originalRequestId}`);
-            // Additional data from the event can be accessed if needed
-            // You can also access other properties of the event object, like event.blockNumber
-
             randomnessContractInterface.on('fulfilledRandomWords', (requestId, randomWords, event) => {
               console.log(`Callback with Request ID: ${requestId.toString()}`);
           
@@ -64,9 +61,11 @@ export async function setupSubmit(element: HTMLButtonElement) {
                   console.log(`Random Words: ${randomWords}`);
           
                   let diceRollsHTML = randomWords.map((word: any) => {
-                      let diceRoll = (word % 6) + 1; // Calculate dice roll
-                      return `<div>Dice Roll: ${diceRoll}</div>`; // Create HTML for each dice roll
-                  }).join('');
+                    let diceRoll = new BigNumber(word.toString());                 
+                    let moduloResult = diceRoll.modulo(6).plus(1);
+
+                    return `<div>Dice Roll: ${moduloResult.toString()}</div>`;
+                }).join('');
           
                   document.querySelector<HTMLDivElement>('#preview')!.innerHTML = `
                       <h2>Transaction Parameters</h2>
