@@ -62,7 +62,8 @@ export async function setupSubmit(element: HTMLButtonElement) {
               timeoutId = setTimeout(() => {
                 console.error('Timeout: No response received within 60 seconds.');
                 document.querySelector<HTMLDivElement>('#preview')!.innerHTML =`
-                <h3>Transaction might take a bit longer than expected due to network congestion. </h3> 
+                <h3>Transaction might take a bit longer than expected due to network congestion or the event was not picked up correctly.</h3> 
+                <p>You can check the event here:<a href="https://sepolia.etherscan.io/address/${randomnessContract}#events" target="_blank">Events of ${randomnessContract}</a></p>
                 <h2>Transaction Parameters</h2> 
                 </p>
                 <p><b>Tx Hash: </b><a href="https://sepolia.etherscan.io/tx/${txHash}" target="_blank">${txHash}</a></p>
@@ -79,12 +80,12 @@ export async function setupSubmit(element: HTMLButtonElement) {
               if (originalRequestId.toString() == requestId.toString()) {
                 console.log(`Random Words: ${randomWords}`);
                 let diceRollsHTML = `<div style="display: flex; flex-wrap: wrap; gap: 20px;">` + 
-                                    randomWords.map((word: any) => {
+                                    randomWords.map((word: any, i: number) => {
                                         let diceRoll = new BigNumber(word.toString());                 
                                         let moduloResult = diceRoll.modulo(6).plus(1);
                                         return `<div style="display: flex; align-items: center; gap: 10px;">
-                                                    <span>Dice Roll:</span>
-                                                    <img src='src/dice/${moduloResult.toString()}.svg' alt='Dice Result: ${moduloResult.toString()}' width="50" height="50" />
+                                                    <span>Dice Roll:${(i+1).toString()}</span>
+                                                    <img src='${moduloResult.toString()}.svg' alt='Dice Result: ${moduloResult.toString()}' width="50" height="50" />
                                                 </div>`;
                                     }).join('') + 
                                     `</div>`;
