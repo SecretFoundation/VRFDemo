@@ -51,19 +51,43 @@ export async function setupSubmit(element: HTMLButtonElement) {
 
         const txHash = await provider.send("eth_sendTransaction", tx_params);
         startLoadingAnimation();
+        let timeoutId: any;
+
         // Set up an event listener for the 'logNewTask' event
         randomnessContractInterface.on('requestRandomness', (originalRequestId) => {
             console.log(`Request ID: ${originalRequestId}`);
+
+              // Set a timeout for 60 seconds
+              
+              timeoutId = setTimeout(() => {
+                console.error('Timeout: No response received within 60 seconds.');
+                document.querySelector<HTMLDivElement>('#preview')!.innerHTML =`
+                <h3>Transaction might take a bit longer than expected due to network congestion. </h3> 
+                <h2>Transaction Parameters</h2> 
+                </p>
+                <p><b>Tx Hash: </b><a href="https://sepolia.etherscan.io/tx/${txHash}" target="_blank">${txHash}</a></p>
+                <p><b>Randomness Contract Address </b><a href="https://sepolia.etherscan.io/address/${randomnessContract}" target="_blank">${randomnessContract}</a></p>
+                <p style="font-size: 0.8em;">${JSON.stringify(tx_params)}</p>`;
+                stopLoadingAnimation();
+              }, 60000);  // 60 seconds
+
             randomnessContractInterface.on('fulfilledRandomWords', (requestId, randomWords, event) => {
               console.log(`Callback with Request ID: ${requestId.toString()}`);
+              clearTimeout(timeoutId);
               stopLoadingAnimation();
+
               if (originalRequestId.toString() == requestId.toString()) {
                 console.log(`Random Words: ${randomWords}`);
-                let diceRollsHTML = randomWords.map((word: any) => {
-                    let diceRoll = new BigNumber(word.toString());                 
-                    let moduloResult = diceRoll.modulo(6).plus(1);
-                    return `<div>Dice Roll: <img src='src/dice/${moduloResult.toString()}.svg' alt='Dice Result: ${moduloResult.toString()}' width="50" height="50" /></div>`;
-                }).join('');
+                let diceRollsHTML = `<div style="display: flex; flex-wrap: wrap; gap: 20px;">` + 
+                                    randomWords.map((word: any) => {
+                                        let diceRoll = new BigNumber(word.toString());                 
+                                        let moduloResult = diceRoll.modulo(6).plus(1);
+                                        return `<div style="display: flex; align-items: center; gap: 10px;">
+                                                    <span>Dice Roll:</span>
+                                                    <img src='src/dice/${moduloResult.toString()}.svg' alt='Dice Result: ${moduloResult.toString()}' width="50" height="50" />
+                                                </div>`;
+                                    }).join('') + 
+                                    `</div>`;
           
                   document.querySelector<HTMLDivElement>('#preview')!.innerHTML = `
                       <h2>Transaction Parameters</h2>
