@@ -50,21 +50,19 @@ export async function setupSubmit(element: HTMLButtonElement) {
           ];
 
         const txHash = await provider.send("eth_sendTransaction", tx_params);
-
+        startLoadingAnimation();
         // Set up an event listener for the 'logNewTask' event
         randomnessContractInterface.on('requestRandomness', (originalRequestId) => {
             console.log(`Request ID: ${originalRequestId}`);
             randomnessContractInterface.on('fulfilledRandomWords', (requestId, randomWords, event) => {
               console.log(`Callback with Request ID: ${requestId.toString()}`);
-          
+              stopLoadingAnimation();
               if (originalRequestId.toString() == requestId.toString()) {
-                  console.log(`Random Words: ${randomWords}`);
-          
-                  let diceRollsHTML = randomWords.map((word: any) => {
+                console.log(`Random Words: ${randomWords}`);
+                let diceRollsHTML = randomWords.map((word: any) => {
                     let diceRoll = new BigNumber(word.toString());                 
                     let moduloResult = diceRoll.modulo(6).plus(1);
-
-                    return `<div>Dice Roll: ${moduloResult.toString()}</div>`;
+                    return `<div>Dice Roll: <img src='src/dice/${moduloResult.toString()}.svg' alt='Dice Result: ${moduloResult.toString()}' width="50" height="50" /></div>`;
                 }).join('');
           
                   document.querySelector<HTMLDivElement>('#preview')!.innerHTML = `
@@ -78,13 +76,23 @@ export async function setupSubmit(element: HTMLButtonElement) {
         });
         });
 
-        document.querySelector<HTMLDivElement>('#preview')!.innerHTML = `
-        </p>
-        <h2>Transaction Parameters</h2>
-        <p><b>Tx Hash: </b><a href="https://sepolia.etherscan.io/tx/${txHash}" target="_blank">${txHash}</a></p>
-        <p><b>Randomness Contract Address </b><a href="https://sepolia.etherscan.io/address/${randomnessContract}" target="_blank">${randomnessContract}</a></p>
-        <p style="font-size: 0.8em;">${JSON.stringify(tx_params)}</p>
-        `
-
+        function startLoadingAnimation() {
+          let dotCount = 0;
+          (window as any).loadingInterval = setInterval(() => {
+              dotCount = (dotCount + 1) % 5;
+              const loadingText = 'Waiting callback with VRF result' +'.'.repeat(dotCount);
+              document.querySelector<HTMLDivElement>('#preview')!.innerHTML =`
+              <h3>${loadingText}</h3> 
+              <h2>Transaction Parameters</h2> 
+              </p>
+              <p><b>Tx Hash: </b><a href="https://sepolia.etherscan.io/tx/${txHash}" target="_blank">${txHash}</a></p>
+              <p><b>Randomness Contract Address </b><a href="https://sepolia.etherscan.io/address/${randomnessContract}" target="_blank">${randomnessContract}</a></p>
+              <p style="font-size: 0.8em;">${JSON.stringify(tx_params)}</p>`;
+              }, 500); // Adjust the speed of dot animation if needed
+        }
+      
+        function stopLoadingAnimation() {
+          clearInterval((window as any).loadingInterval);
+        }
     })
 }
