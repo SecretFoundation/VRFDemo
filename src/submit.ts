@@ -50,6 +50,7 @@ export async function setupSubmit(element: HTMLButtonElement) {
           ];
 
         const txHash = await provider.send("eth_sendTransaction", tx_params);
+        stopLoadingAnimation();
         startLoadingAnimation();
         let timeoutId: any;
 
