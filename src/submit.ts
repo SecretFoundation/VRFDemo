@@ -1,15 +1,16 @@
 import { ethers } from "ethers";
 import { BigNumber } from "bignumber.js";
+import { hexlify} from "ethers/lib/utils";
 
 export async function setupSubmit(element: HTMLButtonElement) {
 
-    const randomnessContract = '0x6350913fDbBb5700100078e1d649836d35F212C1'
+    const randomnessContract = '0x94B13446E9111097a568C388A5Ee6e3dC358743A'
 
     // @ts-ignore
     const provider = new ethers.providers.Web3Provider(window.ethereum);
 
     // Create a contract instance
-    const randomnessAbi = [{"type":"constructor","inputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"VRFGateway","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"fulfillRandomWords","inputs":[{"name":"requestId","type":"uint256","internalType":"uint256"},{"name":"randomWords","type":"uint256[]","internalType":"uint256[]"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"owner","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"requestRandomnessTest","inputs":[],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"setGatewayAddress","inputs":[{"name":"_VRFGateway","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"event","name":"fulfilledRandomWords","inputs":[{"name":"requestId","type":"uint256","indexed":false,"internalType":"uint256"},{"name":"randomWords","type":"uint256[]","indexed":false,"internalType":"uint256[]"}],"anonymous":false},{"type":"event","name":"requestRandomness","inputs":[{"name":"requestId","type":"uint256","indexed":false,"internalType":"uint256"}],"anonymous":false}]
+    const randomnessAbi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"requestId","type":"uint256"},{"indexed":false,"internalType":"uint256[]","name":"randomWords","type":"uint256[]"}],"name":"fulfilledRandomWords","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"requestId","type":"uint256"}],"name":"requestedRandomness","type":"event"},{"inputs":[],"name":"VRFGateway","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"requestId","type":"uint256"},{"internalType":"uint256[]","name":"randomWords","type":"uint256[]"}],"name":"fulfillRandomWords","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint32","name":"_numWords","type":"uint32"},{"internalType":"uint32","name":"_callbackGasLimit","type":"uint32"}],"name":"requestRandomnessTest","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint32","name":"_numWords","type":"uint32"},{"internalType":"uint32","name":"_callbackGasLimit","type":"uint32"}],"name":"requestRandomnessTest2","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"requestRandomnessTestPreset","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"_VRFGateway","type":"address"}],"name":"setGatewayAddress","outputs":[],"stateMutability":"nonpayable","type":"function"}]
     const randomnessContractInterface = new ethers.Contract(randomnessContract, randomnessAbi, provider);
 
     element.addEventListener("click", async function(event: Event){
@@ -24,11 +25,6 @@ export async function setupSubmit(element: HTMLButtonElement) {
         // create the abi interface and encode the function data
         const iface= new ethers.utils.Interface( randomnessAbi )
         const FormatTypes = ethers.utils.FormatTypes;
-        console.log(iface.format(FormatTypes.full))
-
-
-        const functionData = iface.encodeFunctionData("requestRandomnessTest")
-        console.log(functionData)
 
         await (window as any).ethereum.request({
             "method": "wallet_switchEthereumChain",
@@ -39,12 +35,28 @@ export async function setupSubmit(element: HTMLButtonElement) {
             ]
           });
 
+
+        // Can be up to 2000 random numbers, change this according to your needs
+        const numWords = 20; 
+
+        // Change callbackGasLimit according to your needs for post processing in your callback
+        const callbackGasLimit = 300000; 
+        
+        //Then calculate how much gas you have to pay for the callback
+        //Forumla: callbackGasLimit*block.basefee, use an appropriate overhead for the transaction, 1,5x = 3/2 is recommended since gasPrice fluctuates.
+        
+        const gasFee = await provider.getGasPrice()
+
+        const amountOfGas = gasFee.mul(callbackGasLimit).mul(3).div(2)
+
+        const functionData = iface.encodeFunctionData("requestRandomnessTest",[numWords,callbackGasLimit])
+
         const tx_params = [
             {
                 gas: '0x249F0', // 150000
                 to: randomnessContract,
                 from: myAddress,
-                value: '0x00', // 0
+                value: hexlify(amountOfGas),
                 data: functionData, 
             },
           ];
@@ -55,13 +67,13 @@ export async function setupSubmit(element: HTMLButtonElement) {
         let timeoutId: any;
 
         // Set up an event listener for the 'logNewTask' event
-        randomnessContractInterface.on('requestRandomness', (originalRequestId) => {
+        randomnessContractInterface.on('requestedRandomness', (originalRequestId) => {
             console.log(`Request ID: ${originalRequestId}`);
 
-              // Set a timeout for 60 seconds
+              // Set a timeout for 90 seconds
               
               timeoutId = setTimeout(() => {
-                console.error('Timeout: No response received within 60 seconds.');
+                console.error('Timeout: No response received within 90 seconds.');
                 document.querySelector<HTMLDivElement>('#preview')!.innerHTML =`
                 <h3>Transaction might take a bit longer than expected due to network congestion or the event was not picked up correctly.</h3> 
                 <p>You can check the event here:<a href="https://sepolia.etherscan.io/address/${randomnessContract}#events" target="_blank">Events of ${randomnessContract}</a></p>
@@ -71,7 +83,7 @@ export async function setupSubmit(element: HTMLButtonElement) {
                 <p><b>Randomness Contract Address </b><a href="https://sepolia.etherscan.io/address/${randomnessContract}" target="_blank">${randomnessContract}</a></p>
                 <p style="font-size: 0.8em;">${JSON.stringify(tx_params)}</p>`;
                 stopLoadingAnimation();
-              }, 60000);  // 60 seconds
+              }, 90000);  // 90 seconds
 
             randomnessContractInterface.on('fulfilledRandomWords', (requestId, randomWords, event) => {
               console.log(`Callback with Request ID: ${requestId.toString()}`);

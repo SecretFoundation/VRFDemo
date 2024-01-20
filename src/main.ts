@@ -8,7 +8,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 </header>
   <div>
     <h2>Sample Application: Roll the Dice!</h2>
-    <h3>This demo generates 10 (can be up to 2000) verifiable random numbers in just one transaction.</h3>
+    <h3>This demo generates 20 (can be up to 2000) verifiable random numbers in just one transaction.</h3>
     <div id="form">
       <button id="submit">Roll the dice </button>
       <form name="inputForm">
