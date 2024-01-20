@@ -97,7 +97,7 @@ export async function setupSubmit(element: HTMLButtonElement) {
                                         let diceRoll = new BigNumber(word.toString());                 
                                         let moduloResult = diceRoll.modulo(6).plus(1);
                                         return `<div style="display: flex; align-items: center; gap: 10px;">
-                                                    <span>Dice Roll:${(i+1).toString()}</span>
+                                                    <span>${(i+1).toString()}. Dice Roll:</span>
                                                     <img src='${moduloResult.toString()}.svg' alt='Dice Result: ${moduloResult.toString()}' width="50" height="50" />
                                                 </div>`;
                                     }).join('') + 
