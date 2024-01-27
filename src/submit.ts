@@ -126,8 +126,8 @@ export async function setupSubmit(element: HTMLButtonElement) {
     // Can be up to 2000 random numbers, change this according to your needs
     const numWords = 20;
 
-    // Change callbackGasLimit according to your needs for post processing in your callback
-    const callbackGasLimit = 300000;
+    // Change callbackGasLimit according to your needs for post processing in your callback, if you have more numWords, then this number has to be increased.
+    const callbackGasLimit = 90000;
 
     //Then calculate how much gas you have to pay for the callback
     //Forumla: callbackGasLimit*block.basefee, use an appropriate overhead for the transaction, 1,5x = 3/2 is recommended since gasPrice fluctuates.
