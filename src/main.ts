@@ -1,8 +1,8 @@
-import './style.css'
-import { setupConnect } from './connect'
-import { setupSubmit } from './submit'
+import "./style.css";
+import { setupConnect } from "./connect";
+import { setupSubmit } from "./submit";
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
+document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
 <header>
   <h1>Secret VRF on Ethereum</h1>
 </header>
@@ -19,6 +19,6 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <div class="card">
     </div>
   </div>
-`
-setupSubmit(document.querySelector<HTMLButtonElement>('#submit')!)
-setupConnect(document.querySelector<HTMLButtonElement>('#connect')!)
+`;
+setupSubmit(document.querySelector<HTMLButtonElement>("#submit")!);
+setupConnect(document.querySelector<HTMLButtonElement>("#connect")!);
