@@ -121,7 +121,6 @@ export async function setupSubmit(element: HTMLButtonElement) {
 
     // create the abi interface and encode the function data
     const iface = new ethers.utils.Interface(randomnessAbi);
-    const FormatTypes = ethers.utils.FormatTypes;
 
     // Can be up to 2000 random numbers, change this according to your needs
     const numWords = 20;
@@ -155,15 +154,28 @@ export async function setupSubmit(element: HTMLButtonElement) {
     stopLoadingAnimation();
     startLoadingAnimation();
     let timeoutId: any;
+      // Your custom RPC URL (for example, from Infura or Alchemy)
+    const customRpcUrl = "https://rpc2.sepolia.org";
 
+    // Create a provider using the custom URL
+    const EventProvider = new ethers.providers.JsonRpcProvider(customRpcUrl);
+    const EventRandomnessContractInterface = new ethers.Contract(
+      randomnessContract,
+      randomnessAbi,
+      EventProvider
+    );
+    let extraText = "";
+
+    try {
     // Set up an event listener for the 'logNewTask' event
-    randomnessContractInterface.on(
+    EventRandomnessContractInterface.on(
       "requestedRandomness",
       (originalRequestId, event) => {
         const eventTxHash = event.transactionHash;
 
         // Check if the transaction hash matches
         if (eventTxHash === txHash) {
+          extraText = `Request ID: ${originalRequestId}`;
           console.log(`Request ID: ${originalRequestId}`);
 
           // Set a timeout for 90 seconds
@@ -181,7 +193,7 @@ export async function setupSubmit(element: HTMLButtonElement) {
             stopLoadingAnimation();
           }, 90000); // 90 seconds
 
-          randomnessContractInterface.on(
+          EventRandomnessContractInterface.on(
             "fulfilledRandomWords",
             (requestId, randomWords, event) => {
               console.log(`Callback with Request ID: ${requestId.toString()}`);
@@ -209,10 +221,14 @@ export async function setupSubmit(element: HTMLButtonElement) {
                 document.querySelector<HTMLDivElement>(
                   "#preview"
                 )!.innerHTML = `
-                    <h2>Transaction Parameters</h2>
                     <p><b>Request ID: ${requestId} </b></p>
                     <p><b>Dice Rolls:</b></p>
                     ${diceRollsHTML}
+                    <p>You can check the callback here:<a href="https://sepolia.etherscan.io/tx/${event.transactionHash}" target="_blank">Callback TX: ${event.transactionHash}</a></p>
+                    <h2>Transaction Parameters</h2> 
+                    </p>
+                    <p><b>Tx Hash: </b><a href="https://sepolia.etherscan.io/tx/${txHash}" target="_blank">${txHash}</a></p>
+                    <p><b>Randomness Contract Address </b><a href="https://sepolia.etherscan.io/address/${randomnessContract}" target="_blank">${randomnessContract}</a></p>
                     <p style="font-size: 0.8em;">${JSON.stringify(
                       tx_params
                     )}</p>
@@ -222,7 +238,10 @@ export async function setupSubmit(element: HTMLButtonElement) {
           );
         }
       }
-    );
+    );}
+    catch (error) {
+      console.error("Failed to subscribe to events, retrying...", error);
+    }
 
     function startLoadingAnimation() {
       let dotCount = 0;
@@ -232,6 +251,7 @@ export async function setupSubmit(element: HTMLButtonElement) {
           "Waiting callback with VRF result" + ".".repeat(dotCount);
         document.querySelector<HTMLDivElement>("#preview")!.innerHTML = `
               <h3>${loadingText}</h3> 
+              ${extraText && `<p><b>${extraText}</b></p>`}
               <h2>Transaction Parameters</h2> 
               </p>
               <p><b>Tx Hash: </b><a href="https://sepolia.etherscan.io/tx/${txHash}" target="_blank">${txHash}</a></p>
