@@ -155,7 +155,7 @@ export async function setupSubmit(element: HTMLButtonElement) {
     startLoadingAnimation();
     let timeoutId: any;
       // Your custom RPC URL (for example, from Infura or Alchemy)
-    const customRpcUrl = "https://rpc2.sepolia.org";
+    const customRpcUrl = "https://sepolia.gateway.tenderly.co";
 
     // Create a provider using the custom URL
     const EventProvider = new ethers.providers.JsonRpcProvider(customRpcUrl);
@@ -224,7 +224,8 @@ export async function setupSubmit(element: HTMLButtonElement) {
                     <p><b>Request ID: ${requestId} </b></p>
                     <p><b>Dice Rolls:</b></p>
                     ${diceRollsHTML}
-                    <p>You can check the callback here:<a href="https://sepolia.etherscan.io/tx/${event.transactionHash}" target="_blank">Callback TX: ${event.transactionHash}</a></p>
+                    <p>You can check the callback here:
+                    <a href="https://sepolia.etherscan.io/tx/${event.transactionHash}" target="_blank">Callback TX: ${event.transactionHash}</a></p>
                     <h2>Transaction Parameters</h2> 
                     </p>
                     <p><b>Tx Hash: </b><a href="https://sepolia.etherscan.io/tx/${txHash}" target="_blank">${txHash}</a></p>
