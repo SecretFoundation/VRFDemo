@@ -5,9 +5,6 @@ import { hexlify } from "ethers/lib/utils";
 export async function setupSubmit(element: HTMLButtonElement) {
   const randomnessContract = "0x3C260caf0763eD69dfc6628Ab2480717b4B72d0a";
 
-  // @ts-ignore
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-
   // Create a contract instance
   const randomnessAbi = [
     { inputs: [], stateMutability: "nonpayable", type: "constructor" },
@@ -104,20 +101,16 @@ export async function setupSubmit(element: HTMLButtonElement) {
       type: "function",
     },
   ];
-  const randomnessContractInterface = new ethers.Contract(
-    randomnessContract,
-    randomnessAbi,
-    provider
-  );
 
   element.addEventListener("click", async function (event: Event) {
     event.preventDefault();
-    const [myAddress] = await provider.send("eth_requestAccounts", []);
-
     await (window as any).ethereum.request({
       method: "wallet_switchEthereumChain",
       params: [{ chainId: "0xAA36A7" }],
     });
+    // @ts-ignore
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const [myAddress] = await provider.send("eth_requestAccounts", []);
 
     // create the abi interface and encode the function data
     const iface = new ethers.utils.Interface(randomnessAbi);
