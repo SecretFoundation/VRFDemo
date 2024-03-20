@@ -3,7 +3,7 @@ import { BigNumber } from "bignumber.js";
 import { hexlify } from "ethers/lib/utils";
 
 export async function setupSubmit(element: HTMLButtonElement) {
-  const randomnessContract = "0x3C260caf0763eD69dfc6628Ab2480717b4B72d0a";
+  const randomnessContract = "0x95eBa0749DFe936d9c6d79c0431B94b5424173f8";
 
   // Create a contract instance
   const randomnessAbi = [
@@ -106,7 +106,7 @@ export async function setupSubmit(element: HTMLButtonElement) {
     event.preventDefault();
     await (window as any).ethereum.request({
       method: "wallet_switchEthereumChain",
-      params: [{ chainId: "0xAA36A7" }],
+      params: [{ chainId: "0x1F47B" }],
     });
     // @ts-ignore
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -125,8 +125,9 @@ export async function setupSubmit(element: HTMLButtonElement) {
     //Forumla: callbackGasLimit*block.basefee, use an appropriate overhead for the transaction, 1,5x = 3/2 is recommended since gasPrice fluctuates.
 
     const gasFee = await provider.getGasPrice();
+    console.log(gasFee.toNumber())
 
-    const amountOfGas = gasFee.mul(callbackGasLimit).mul(3).div(2);
+    const amountOfGas = gasFee.mul(callbackGasLimit).mul(3).div(2).mul(1000);
 
     const functionData = iface.encodeFunctionData("requestRandomnessTest", [
       numWords,
@@ -148,7 +149,7 @@ export async function setupSubmit(element: HTMLButtonElement) {
     startLoadingAnimation();
     let timeoutId: any;
       // Your custom RPC URL (for example, from Infura or Alchemy)
-    const customRpcUrl = "https://sepolia.gateway.tenderly.co";
+    const customRpcUrl = "https://node.ghostnet.etherlink.com";
 
     // Create a provider using the custom URL
     const EventProvider = new ethers.providers.JsonRpcProvider(customRpcUrl);
@@ -177,11 +178,11 @@ export async function setupSubmit(element: HTMLButtonElement) {
             console.error("Timeout: No response received within 90 seconds.");
             document.querySelector<HTMLDivElement>("#preview")!.innerHTML = `
               <h3>Transaction might take a bit longer than expected due to network congestion or the event was not picked up correctly.</h3> 
-              <p>You can check the event here:<a href="https://sepolia.etherscan.io/address/${randomnessContract}#events" target="_blank">Events of ${randomnessContract}</a></p>
+              <p>You can check the event here:<a href="https://testnet-explorer.etherlink.com/address/${randomnessContract}#events" target="_blank">Events of ${randomnessContract}</a></p>
               <h2>Transaction Parameters</h2> 
               </p>
-              <p><b>Tx Hash: </b><a href="https://sepolia.etherscan.io/tx/${txHash}" target="_blank">${txHash}</a></p>
-              <p><b>Randomness Contract Address </b><a href="https://sepolia.etherscan.io/address/${randomnessContract}" target="_blank">${randomnessContract}</a></p>
+              <p><b>Tx Hash: </b><a href="https://testnet-explorer.etherlink.com/tx/${txHash}" target="_blank">${txHash}</a></p>
+              <p><b>Randomness Contract Address </b><a href="https://testnet-explorer.etherlink.comaddress/${randomnessContract}" target="_blank">${randomnessContract}</a></p>
               <p style="font-size: 0.8em;">${JSON.stringify(tx_params)}</p>`;
             stopLoadingAnimation();
           }, 90000); // 90 seconds
@@ -218,11 +219,11 @@ export async function setupSubmit(element: HTMLButtonElement) {
                     <p><b>Dice Rolls:</b></p>
                     ${diceRollsHTML}
                     <p>You can check the callback here:
-                    <a href="https://sepolia.etherscan.io/tx/${event.transactionHash}" target="_blank">Callback TX: ${event.transactionHash}</a></p>
+                    <a href="https://testnet-explorer.etherlink.comtx/${event.transactionHash}" target="_blank">Callback TX: ${event.transactionHash}</a></p>
                     <h2>Transaction Parameters</h2> 
                     </p>
-                    <p><b>Tx Hash: </b><a href="https://sepolia.etherscan.io/tx/${txHash}" target="_blank">${txHash}</a></p>
-                    <p><b>Randomness Contract Address </b><a href="https://sepolia.etherscan.io/address/${randomnessContract}" target="_blank">${randomnessContract}</a></p>
+                    <p><b>Tx Hash: </b><a href="https://testnet-explorer.etherlink.com/tx/${txHash}" target="_blank">${txHash}</a></p>
+                    <p><b>Randomness Contract Address </b><a href="https://testnet-explorer.etherlink.com/address/${randomnessContract}" target="_blank">${randomnessContract}</a></p>
                     <p style="font-size: 0.8em;">${JSON.stringify(
                       tx_params
                     )}</p>
@@ -248,8 +249,8 @@ export async function setupSubmit(element: HTMLButtonElement) {
               ${extraText && `<p><b>${extraText}</b></p>`}
               <h2>Transaction Parameters</h2> 
               </p>
-              <p><b>Tx Hash: </b><a href="https://sepolia.etherscan.io/tx/${txHash}" target="_blank">${txHash}</a></p>
-              <p><b>Randomness Contract Address </b><a href="https://sepolia.etherscan.io/address/${randomnessContract}" target="_blank">${randomnessContract}</a></p>
+              <p><b>Tx Hash: </b><a href="https://testnet-explorer.etherlink.com/tx/${txHash}" target="_blank">${txHash}</a></p>
+              <p><b>Randomness Contract Address </b><a href="https://testnet-explorer.etherlink.com/address/${randomnessContract}" target="_blank">${randomnessContract}</a></p>
               <p style="font-size: 0.8em;">${JSON.stringify(tx_params)}</p>`;
       }, 500); // Adjust the speed of dot animation if needed
     }

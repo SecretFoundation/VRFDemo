@@ -4,7 +4,7 @@ import { setupSubmit } from "./submit";
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
 <header>
-  <h1>Secret VRF on Ethereum</h1>
+  <h1>Secret VRF on Tezos Etherlink</h1>
 </header>
   <div>
     <h2>Sample Application: Roll the Dice!</h2>
