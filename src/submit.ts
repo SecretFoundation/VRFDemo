@@ -122,9 +122,13 @@ export async function setupSubmit(element: HTMLButtonElement) {
     const callbackGasLimit = 90000;
 
     //Then calculate how much gas you have to pay for the callback
-    //Forumla: callbackGasLimit*block.basefee, use an appropriate overhead for the transaction, 1,5x = 3/2 is recommended since gasPrice fluctuates.
+    //Forumla: callbackGasLimit*tx.gasfee, use an appropriate overhead for the transaction, 1,5x = 3/2 is recommended since gasPrice fluctuates.
+    //For this we try to gather the old pre and post EIP-1559 gas costs from the RPCs (to support both in parallel)
 
-    const gasFee = await provider.getGasPrice();
+    const feeData = await provider.getFeeData();
+    const maxFeePerGas = feeData.maxFeePerGas;
+    const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
+    const gasFee = (maxFeePerGas && maxPriorityFeePerGas) ? maxFeePerGas.add(maxPriorityFeePerGas) : await provider.getGasPrice()
 
     const amountOfGas = gasFee.mul(callbackGasLimit).mul(3).div(2);
 
