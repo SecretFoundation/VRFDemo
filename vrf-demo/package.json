@@ -1,0 +1,31 @@
+{
+  "name": "vrf-demo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "14.2.12",
+    "react": "^18",
+    "react-dom": "^18",
+    "@blake.regalia/belt": "^0.35.1",
+    "@solar-republic/cosmos-grpc": "^0.15.3",
+    "@solar-republic/neutrino": "^1.2.4",
+    "@web3modal/ethers5": "^4.1.9",
+    "ethers": "^5.7.2",
+    "secretjs": "^1.12.5",
+    "secure-random": "^1.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
