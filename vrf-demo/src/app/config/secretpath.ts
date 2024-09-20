@@ -9,7 +9,7 @@ export const mainnet = {
       "0xfaFCfceC4e29e9b4ECc8C0a3f7df1011580EEEf2",
     publicClientAddressArbitrumOneMainnet:
       "0xfaFCfceC4e29e9b4ECc8C0a3f7df1011580EEEf2",
-    publicClientAddressAvalanceCChainMainnet:
+      publicClientAddressAvalancheCChainMainnet:
       "0xfaFCfceC4e29e9b4ECc8C0a3f7df1011580EEEf2",
     publicClientAddressBaseMainnet: "0xf50c73581d6def7f911aC1D6d0d5e928691AAa9E",
     publicClientAddressLineaMainnet: "0xfaFCfceC4e29e9b4ECc8C0a3f7df1011580EEEf2",

@@ -6,6 +6,14 @@ import { setupSubmit, subscribeToEvents } from "./functions/submit"; // Import t
 import { BigNumber } from "bignumber.js";
 import { useFetchChainId } from "./utils/fetchChainId"; // Import the fetchChainId hook
 
+// Import the SVGs as React components
+import Dice1 from './assets/1.svg';
+import Dice2 from './assets/2.svg';
+import Dice3 from './assets/3.svg';
+import Dice4 from './assets/4.svg';
+import Dice5 from './assets/5.svg';
+import Dice6 from './assets/6.svg';
+
 // Initialize Web3Modal
 initializeWeb3Modal();
 
@@ -34,6 +42,20 @@ export default function Home() {
     }
   };
 
+  // Function to return the correct dice component based on the dice roll
+  const getDiceComponent = (diceRoll: string) => {
+    const style = { width: '25%', height: '25%' }; // Scale to 1/4 of the original size
+    switch (diceRoll) {
+      case '1': return <Dice1 style={style} />;
+      case '2': return <Dice2 style={style} />;
+      case '3': return <Dice3 style={style} />;
+      case '4': return <Dice4 style={style} />;
+      case '5': return <Dice5 style={style} />;
+      case '6': return <Dice6 style={style} />;
+      default: return null;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col items-center px-4 py-8">
       {/* Connect button */}
@@ -59,10 +81,14 @@ export default function Home() {
             <h3>Dice Rolls:</h3>
             <div className="flex flex-wrap gap-4 justify-center">
               {randomWords.map((word, index) => {
+                // Calculate the dice roll (1-6)
                 const diceRoll = new BigNumber(word.toString()).modulo(6).plus(1).toString();
+
+                // Render the correct dice image
                 return (
-                  <div key={index}>
-                    {index + 1}. Dice Roll: {diceRoll}
+                  <div key={index} className="flex flex-col items-center">
+              
+                    {getDiceComponent(diceRoll)}
                   </div>
                 );
               })}
